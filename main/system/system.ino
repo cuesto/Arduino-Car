@@ -13,8 +13,10 @@ void setup()
   // Set up the motor pin to be an output:
   pinMode(motorPin1, OUTPUT);
   pinMode(motorPin2, OUTPUT);
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
   // Set up the serial port:
-  //Serial.begin(9600);
+  Serial.begin(9600);
   speed = 255;
 }
 
@@ -25,20 +27,52 @@ void loop()
   // To try different things, uncomment one of the following lines
   // and comment the other ones. See the functions below to learn
   // what they do and how they work.
-
+  ProximityMeasurement();
    //motorOnThenOff();
   // motorOnThenOffWithSpeed();
-   motorAcceleration();
+   
     // serialSpeed();
+}
+
+void ProximityMeasurement()
+{
+  long duration, distance;
+digitalWrite(trigPin, LOW);  // Added this line
+delayMicroseconds(2); // Added this line
+digitalWrite(trigPin, HIGH);
+//  delayMicroseconds(1000); - Removed this line
+delayMicroseconds(10); // Added this line
+digitalWrite(trigPin, LOW);
+duration = pulseIn(echoPin, HIGH);
+distance = (duration/2) / 29.1;
+if (distance < 8) {  // This is where the LED On/Off happens digitalWrite(led,HIGH); // When the Red condition is met, the Green LED should turn off digitalWrite(led2,LOW); } else { digitalWrite(led,LOW); digitalWrite(led2,HIGH); } if (distance >= 200 || distance <= 0){
+Serial.println("Out of range");
+stopMotor();
+}
+else {
+Serial.print(distance);
+Serial.println(" cm");
+startMotor();
+}
+delay(500);
+
+  
 }
 
 // This function slowly accelerates the motor to full speed,
 // then back down to zero.
 
-void motorAcceleration()
+void stopMotor()
+{
+  speed = 0;
+  analogWrite(motorPin1,speed);	// set the new speed
+  analogWrite(motorPin2,speed);	// set the new speed
+}
+
+void startMotor()
 {
   //int speed;
-
+  speed = 255;
   analogWrite(motorPin1,speed);	// set the new speed
   analogWrite(motorPin2,speed);	// set the new speed
   // decelerate the motor
