@@ -1,20 +1,21 @@
+#include <Servo.h>
+
 #define trigPin 13
 #define echoPin 12
 
 const int motorPin1 = 9;
 const int motorPin2 = 10;
-int speed = 0;
+Servo servo1;
 
 void setup()
 {
-  // Set up the motor pin to be an output:
   pinMode(motorPin1, OUTPUT);
   pinMode(motorPin2, OUTPUT);
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
+  servo1.attach(6);
   // Set up the serial port:
   Serial.begin(9600);
-  speed = 255;
 }
 
 
@@ -26,25 +27,26 @@ void loop()
 void scanDistance()
 {
   long duration, distance;
-digitalWrite(trigPin, LOW);  // Added this line
-delayMicroseconds(2); // Added this line
-digitalWrite(trigPin, HIGH);
-delayMicroseconds(10); // Added this line
-digitalWrite(trigPin, LOW);
-duration = pulseIn(echoPin, HIGH);
-distance = (duration/2) / 29.1;
-if (distance < 8) {  // This is where the LED On/Off happens digitalWrite(led,HIGH); // When the Red condition is met, the Green LED should turn off digitalWrite(led2,LOW); } else { digitalWrite(led,LOW); digitalWrite(led2,HIGH); } if (distance >= 200 || distance <= 0){
-Serial.println("Out of range");
-setMotorSpeed(0);
-}
-else {
-Serial.print(distance);
-Serial.println(" cm");
-setMotorSpeed(255);
-}
-delay(500);
-
-  
+  digitalWrite(trigPin, LOW);  // Added this line
+  delayMicroseconds(2); // Added this line
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10); // Added this line
+  digitalWrite(trigPin, LOW);
+  duration = pulseIn(echoPin, HIGH);
+  distance = (duration/2) / 29.1;
+  if (distance < 8) 
+  {
+    Serial.println("Out of range");
+    setMotorSpeed(0);
+    changeDirection(distance);
+  }
+  else 
+  {
+    Serial.print(distance);
+    Serial.println(" cm");
+    setMotorSpeed(255);
+  }
+  delay(500);
 }
 
 void setMotorSpeed(int speed)
@@ -53,3 +55,17 @@ void setMotorSpeed(int speed)
   analogWrite(motorPin2,speed);	// set the new speed
 }
 
+void changeDirection(long distance)
+{
+  servo1.write(90);    // Tell servo to go to 90 degrees
+  
+  delay(1000);         // Pause to get it time to move
+  
+  servo1.write(180);   // Tell servo to go to 180 degrees
+  
+  delay(1000);         // Pause to get it time to move
+  
+  servo1.write(0);     // Tell servo to go to 0 degrees
+  
+  delay(1000);
+}  
