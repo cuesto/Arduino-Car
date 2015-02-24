@@ -48,14 +48,13 @@ void setDirection(long distance)
   {
     if(distance < 20)
     {
-      setMotorSpeed(0);
-      servo1.write(90);
+      setMotorSpeed(0); // stop the motor
+      servo1.write(90); // return to the original position
       return;
     } 
     else
     {
-      
-      if(random(0,2) == 0)
+      if(random(0,2) == 0) // ramdonly choose where to go
       {
         servo1.write(70);
       }
